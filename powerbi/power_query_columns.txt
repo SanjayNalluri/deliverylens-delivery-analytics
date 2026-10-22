@@ -1,0 +1,27 @@
+DeliveryLens - Step 4b: Power Query columns
+Power BI: Home > Transform data. Select query "vw_delivered_orders".
+For each column: Add Column > Custom Column > paste the name and formula > OK.
+Then set the type shown (click the icon left of the column header).
+Finally: Home > Close & Apply.
+
+1) Name: Delivery Status        Type: Text
+if [is_late] = 1 then "Late" else "On time"
+
+2) Name: Promise Bucket         Type: Text
+if [days_vs_promise] <= -15 then "1 Early 15+ days"
+else if [days_vs_promise] <= -8 then "2 Early 8-14 days"
+else if [days_vs_promise] <= -1 then "3 Early 1-7 days"
+else if [days_vs_promise] = 0 then "4 On the promised day"
+else if [days_vs_promise] <= 3 then "5 Late 1-3 days"
+else if [days_vs_promise] <= 7 then "6 Late 4-7 days"
+else "7 Late 8+ days"
+
+3) Name: Route                  Type: Text
+if [seller_id] = null then "Multi-seller" else if [same_state] = 1 then "Same state" else "Different state"
+
+4) Name: Region                 Type: Text   (IBGE's 5 official regions of Brazil)
+if List.Contains({"SP","RJ","MG","ES"}, [customer_state]) then "Southeast"
+else if List.Contains({"PR","SC","RS"}, [customer_state]) then "South"
+else if List.Contains({"DF","GO","MT","MS"}, [customer_state]) then "Center-West"
+else if List.Contains({"AM","PA","AC","RO","RR","AP","TO"}, [customer_state]) then "North"
+else "Northeast"

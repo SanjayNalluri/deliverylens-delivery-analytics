@@ -1,0 +1,53 @@
+// DeliveryLens - Step 4c: DAX measures
+// Power BI: Home > Enter data > name the table "_Measures" > Load.
+// Select _Measures in the Data pane, then Home > New measure, paste ONE measure, press Enter.
+// Repeat for each block below. Set the format shown in Measure tools > Format.
+// (V = vw_delivered_orders)
+
+Orders = COUNTROWS ( vw_delivered_orders )                                   // Whole number
+
+Late Orders = SUM ( vw_delivered_orders[is_late] )                           // Whole number
+
+Late % = DIVIDE ( [Late Orders], [Orders] )                                  // Percentage, 1 decimal
+
+Avg Review = AVERAGE ( vw_delivered_orders[review_score] )                   // Decimal, 2
+
+One-Star % =
+DIVIDE (
+    CALCULATE ( COUNTROWS ( vw_delivered_orders ), vw_delivered_orders[review_score] = 1 ),
+    CALCULATE ( COUNTROWS ( vw_delivered_orders ), NOT ISBLANK ( vw_delivered_orders[review_score] ) )
+)                                                                            // Percentage, 1 decimal
+
+Avg Handling Days = AVERAGE ( vw_delivered_orders[handling_days] )           // Decimal, 1
+
+Avg Transit Days = AVERAGE ( vw_delivered_orders[transit_days] )             // Decimal, 1
+
+Avg Promised Days = AVERAGE ( vw_delivered_orders[promised_days] )           // Decimal, 1
+
+Median Days vs Promise = MEDIAN ( vw_delivered_orders[days_vs_promise] )     // Whole number (negative = early)
+
+Seller Missed Deadline % = AVERAGE ( vw_delivered_orders[seller_missed_deadline] )   // Percentage, 1 decimal
+
+// Late % in the 3 peak months vs the rest (used in a card on page 1)
+Late % Peak Months =
+CALCULATE (
+    [Late %],
+    vw_delivered_orders[purchase_month] IN { DATE(2017,11,1), DATE(2018,2,1), DATE(2018,3,1) }
+)                                                                            // Percentage, 1 decimal
+
+// Pareto: share of all late orders caused by this seller and every seller ranked above it.
+// Use on page 3 with seller_id on the x-axis, sorted by Late Orders (descending).
+Cumulative Late Share =
+VAR CurrentLate = [Late Orders]
+VAR Sellers =
+    ADDCOLUMNS (
+        CALCULATETABLE ( VALUES ( vw_delivered_orders[seller_id] ),
+                         ALLSELECTED ( vw_delivered_orders[seller_id] ),
+                         NOT ISBLANK ( vw_delivered_orders[seller_id] ) ),
+        "@late", [Late Orders]
+    )
+RETURN
+    DIVIDE (
+        SUMX ( FILTER ( Sellers, [@late] >= CurrentLate ), [@late] ),
+        SUMX ( Sellers, [@late] )
+    )                                                                        // Percentage, 0 decimals
