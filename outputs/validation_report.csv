@@ -1,0 +1,38 @@
+area,check,result,detail
+Rows,same set of order_ids,PASS,"only SQL 0, only pandas 0"
+Rows,is_late matches per order,PASS,"0 mismatches of 96,018"
+Rows,days_vs_promise matches per order,PASS,"0 mismatches of 96,018"
+Rows,promised_days matches per order,PASS,"0 mismatches of 96,018"
+Rows,seller_missed_deadline matches per order,PASS,"0 mismatches of 96,018"
+Rows,same_state matches per order,PASS,"0 mismatches of 96,018"
+Rows,n_items matches per order,PASS,"0 mismatches of 96,018"
+Rows,n_sellers matches per order,PASS,"0 mismatches of 96,018"
+Rows,handling_days matches per order,PASS,"0 mismatches of 96,018"
+Rows,transit_days matches per order,PASS,"0 mismatches of 96,018"
+Rows,total_days matches per order,PASS,"0 mismatches of 96,018"
+Rows,items_value matches per order,PASS,"0 mismatches of 96,018"
+Rows,freight_value matches per order,PASS,"0 mismatches of 96,018"
+Rows,review_score matches per order,PASS,"0 mismatches of 96,018"
+Rows,seller_id matches per order,PASS,NULL for multi-seller orders in both
+README,orders_kept,PASS,SQL 96018.000 | pandas 96018.000 | README 96018
+README,late_orders,PASS,SQL 6528.000 | pandas 6528.000 | README 6528
+README,late_pct,PASS,SQL 6.799 | pandas 6.799 | README 6.8
+README,late_handling_days,PASS,SQL 6.039 | pandas 6.039 | README 6.0
+README,late_transit_days,PASS,SQL 27.899 | pandas 27.899 | README 27.9
+README,ontime_handling_days,PASS,SQL 2.997 | pandas 2.997 | README 3.0
+README,ontime_transit_days,PASS,SQL 7.991 | pandas 7.991 | README 8.0
+README,late_missed_deadline_pct,PASS,SQL 27.742 | pandas 27.742 | README 27.7
+README,ontime_missed_deadline_pct,PASS,SQL 7.553 | pandas 7.553 | README 7.6
+README,peak_late_pct,PASS,SQL 15.149 | pandas 15.149 | README 15.1
+README,other_late_pct,PASS,SQL 4.483 | pandas 4.483 | README 4.5
+README,same_state_late_pct,PASS,SQL 4.568 | pandas 4.568 | README 4.6
+README,diff_state_late_pct,PASS,SQL 8.171 | pandas 8.171 | README 8.2
+README,late_pct_MA,PASS,SQL 17.606 | pandas 17.606 | README 17.6
+README,late_pct_SP,PASS,SQL 4.500 | pandas 4.500 | README 4.5
+README,late_pct_PR,PASS,SQL 4.068 | pandas 4.068 | README 4.1
+README,late_pct_2017_11,PASS,SQL 12.404 | pandas 12.404 | README 12.4
+README,late_pct_2018_03,PASS,SQL 18.963 | pandas 18.963 | README 19.0
+README,pareto_sellers_50pct,PASS,SQL 98.000 | pandas 98.000 | README 98
+README,n_single_sellers,PASS,SQL 2923.000 | pandas 2923.000 | README 2923
+README,median_days_vs_promise,PASS,SQL -12.000 | pandas -12.000 | README -12
+README,multi_seller_orders,PASS,SQL 1249.000 | pandas 1249.000 | README 1249

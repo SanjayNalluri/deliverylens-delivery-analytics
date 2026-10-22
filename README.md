@@ -2,7 +2,7 @@
 
 **Where does delivery delay come from (seller or courier, region or season), and what does it cost in customer ratings?**
 
-A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Brazilian e-commerce marketplace (Jan 2017 – Aug 2018). All cleaning and analysis is in T-SQL (SSMS); the dashboard is built in Power BI on top of one SQL view; significance tests, a regression and what-if estimates are in Python.
+A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Brazilian e-commerce marketplace (Jan 2017 – Aug 2018). All cleaning and analysis is in T-SQL (SSMS); the dashboard is built in Power BI on top of one SQL view; significance tests, a regression and what-if estimates are in Python. The cleaned data and headline figures are cross-checked against an independent rebuild from the raw data ([37/37 checks pass](#validation-srcstep6_validatepy)).
 
 ---
 
@@ -15,6 +15,9 @@ A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Br
 **Actions for a logistics manager:** book extra courier capacity before peak months, enforce the seller hand-over deadline (alerts on the 98 sellers that cause half of late orders), and set longer promised dates for Northeast routes.
 
 *These are historical patterns from one marketplace in 2017–2018, not a measure of current performance.*
+
+![DeliveryLens Power BI dashboard: overview page](outputs/01_overview.png)
+*Power BI overview page. Two more pages (Where & why, Sellers) are [below](#dashboard-power-bi).*
 
 ---
 
@@ -43,7 +46,6 @@ A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Br
 
 ## Dashboard (Power BI)
 
-![Overview](outputs/01_overview.png)
 ![Where & why](outputs/02_where_why.png)
 ![Sellers](outputs/03_sellers.png)
 
@@ -96,6 +98,18 @@ The 98 sellers are mostly **high-volume** sellers with a modest late rate (8.2%)
 
 ---
 
+## Validation (`src/step6_validate.py`)
+
+The cleaned order table and the 22 headline figures are checked end to end: **37 of 37 checks pass** (`outputs/validation_report.csv`).
+
+| Check | How | Result |
+|---|---|---|
+| Same orders | SQL view vs an independent pandas rebuild from the raw CSVs (no SQL) | 96,018 = 96,018 order IDs |
+| Same values per order | late flag, days early/late, promised days, handling / transit / total days, missed deadline, same state, items, sellers, value, freight, review | 0 mismatches on all 13 columns |
+| Headline numbers | 22 README figures (6.8% late, 27.9 transit days, 98 sellers, MA 17.6%, …) recomputed from both sources | SQL = pandas = README |
+
+---
+
 ## Data
 
 [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle, CC BY-NC-SA 4.0): 99,441 orders, 8 tables.
@@ -130,6 +144,7 @@ The 98 sellers are mostly **high-volume** sellers with a modest late rate (8.2%)
 | 3 | `sql/04_analysis.sql` | 8 business questions (CTEs, window functions: `ROW_NUMBER`, `RANK`, running `SUM() OVER`, `PERCENTILE_CONT`) |
 | 4 | `powerbi/` | Power BI report on the view (Import mode), Power Query columns, DAX measures |
 | 5 | `src/step5_stats_impact.py` | Wilson 95% CIs, Welch t / Mann-Whitney / chi-square tests, OLS regression with controls, what-if scenarios → `outputs/stats_*.csv`, `whatif_scenarios.csv`, `04_state_ci.png` |
+| 6 | `src/step6_validate.py` | Rebuilds the view from raw CSVs in pandas and checks it against SQL Server row by row, then checks every README number → `outputs/validation_report.csv` |
 
 ---
 
@@ -154,7 +169,7 @@ The 98 sellers are mostly **high-volume** sellers with a modest late rate (8.2%)
    python src/step1_load_sqlserver.py
    ```
 4. In SSMS, run `sql/02_data_checks.sql`, `sql/03_delivery_view.sql`, `sql/04_analysis.sql`.
-5. `python src/step5_stats_impact.py` (same `SERVER` setting); compare with the tables above.
+5. `python src/step5_stats_impact.py` and `python src/step6_validate.py` (same `SERVER` setting); the second should print 37 of 37 checks passed.
 6. Open `powerbi/DeliveryLens.pbix` → **Transform data → Data source settings** → change the server to yours → **Refresh**.
 
 **Tech:** SQL Server 2022 · SSMS · T-SQL · Power BI (Power Query, DAX) · Python (pandas, pyodbc, SciPy, statsmodels, matplotlib)
