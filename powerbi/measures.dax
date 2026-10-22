@@ -37,12 +37,13 @@ CALCULATE (
 
 // Pareto: share of all late orders caused by this seller and every seller ranked above it.
 // Use on page 3 with seller_id on the x-axis, sorted by Late Orders (descending).
+// ALL (not ALLSELECTED) so the share is of ALL sellers' late orders even when the chart shows only the top 85.
 Cumulative Late Share =
 VAR CurrentLate = [Late Orders]
 VAR Sellers =
     ADDCOLUMNS (
         CALCULATETABLE ( VALUES ( vw_delivered_orders[seller_id] ),
-                         ALLSELECTED ( vw_delivered_orders[seller_id] ),
+                         ALL ( vw_delivered_orders[seller_id] ),
                          NOT ISBLANK ( vw_delivered_orders[seller_id] ) ),
         "@late", [Late Orders]
     )
