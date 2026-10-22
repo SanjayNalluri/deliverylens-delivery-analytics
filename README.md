@@ -2,7 +2,19 @@
 
 **Where does delivery delay come from (seller or courier, region or season), and what does it cost in customer ratings?**
 
-A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Brazilian e-commerce marketplace (Jan 2017 – Aug 2018). All cleaning and analysis is in T-SQL (SSMS); the dashboard is built in Power BI on top of one SQL view.
+A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Brazilian e-commerce marketplace (Jan 2017 – Aug 2018). All cleaning and analysis is in T-SQL (SSMS); the dashboard is built in Power BI on top of one SQL view; significance tests, a regression and what-if estimates are in Python.
+
+---
+
+## Executive summary
+
+1. **Late delivery is a peak-season problem.** In Nov 2017, Feb and Mar 2018 the late rate was **15.1% vs 4.5%** in other months (difference 10.7 pts, 95% CI 10.2–11.2). Bringing those months to the normal rate would have avoided **≈2,200 late orders, 34% of all late orders**.
+2. **Lateness costs ratings, even after controls.** An order 8+ days late scores **2.5 points lower** (on a 1–5 scale) than an on-time order from the same state and month with a similar value and freight; 1–3 days late already costs **≈1 point**.
+3. **The delay sits with the courier, triggered by sellers.** Late orders spend 27.9 days in transit vs 8.0; in 27.7% of them the seller had already missed its hand-over deadline. If every seller met that deadline, **≈1,350 late orders (21%)** would be expected to disappear.
+
+**Actions for a logistics manager:** book extra courier capacity before peak months, enforce the seller hand-over deadline (alerts on the 98 sellers that cause half of late orders), and set longer promised dates for Northeast routes.
+
+*These are historical patterns from one marketplace in 2017–2018, not a measure of current performance.*
 
 ---
 
@@ -22,8 +34,8 @@ A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Br
 
 ### Recommendations (what the data supports)
 
-1. **Watch the 98 sellers.** Half of all late orders come from 3.4% of sellers; a hand-over-deadline alert on these sellers targets the problem directly.
-2. **Plan courier capacity for peaks.** The three peak months carry a 15.1% late rate vs 6.8% overall.
+1. **Plan courier capacity for peaks.** Peak months run at 15.1% late vs 4.5%; matching normal months would avoid ≈2,200 late orders (34%).
+2. **Enforce the seller hand-over deadline.** Meeting it everywhere would avoid ≈1,350 late orders (21%); start with alerts on the 98 sellers that cause half of late orders.
 3. **Make the promised date depend on route and season**, not one rule: the median order is 12 days early, but Northeast and peak-month orders still miss.
 4. **Fulfil closer to the customer.** Same-state orders are late half as often (see [HubShift India](https://github.com/SanjayNalluri/hubshift-india-network-design) for a warehouse-network model).
 
@@ -42,6 +54,45 @@ A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Br
 | Sellers | Pareto of late orders (top 85 sellers, cumulative share of all late orders), table of sellers with 50+ orders |
 
 **Power Query** adds 4 columns (Delivery Status, Promise Bucket, Route, Region). **DAX**: 12 measures incl. a Pareto cumulative-share measure (`powerbi/measures.dax`). Full report: `powerbi/DeliveryLens.pbix`, PDF: `outputs/DeliveryLens_dashboard.pdf`.
+
+---
+
+## Statistical checks (`src/step5_stats_impact.py`)
+
+**Are the differences real?** All three main comparisons are far outside chance (p < 0.001):
+
+| Comparison | Result | Difference [95% CI] |
+|---|---|---|
+| Avg review, late vs on-time | 2.27 vs 4.29 | −2.02 [−2.06, −1.98]; effect size (Cohen's d) −1.47, large |
+| Late %, different vs same state | 8.2% vs 4.6% | +3.6 pts [3.3, 3.9] |
+| Late %, peak vs other months | 15.1% vs 4.5% | +10.7 pts [10.2, 11.2] |
+
+**Late % by state with 95% confidence intervals.** MA (17.6%, CI 15.0–20.6) is clearly worst even on 710 orders; SP (4.5%, CI 4.3–4.7) and PR (4.1%, CI 3.6–4.7) are clearly best.
+
+![State CI](outputs/04_state_ci.png)
+
+**Does lateness itself lower the review?** A regression (OLS, robust standard errors, 95,376 reviewed orders) controls for customer state, purchase month, order value, freight, item count and multi-seller orders. The rating drop barely changes once these are held equal:
+
+| Delivery vs promise | Raw gap vs on-time | After controls [95% CI] |
+|---|---|---|
+| Late 1–3 days | −1.00 | **−0.99** [−1.06, −0.92] |
+| Late 4–7 days | −2.19 | **−2.16** [−2.24, −2.09] |
+| Late 8+ days | −2.60 | **−2.54** [−2.59, −2.49] |
+
+This rules out the listed factors as the explanation, but it is still observational: something not in the data (e.g. a damaged parcel that is also slow) could affect both.
+
+## What-if impact
+
+Each scenario changes one thing and keeps everything else as it was. They overlap, so they must not be added together. Rating change uses the regression penalties above. No cost data exists in Olist, so impact is stated in late orders and rating points, not money.
+
+| Scenario | Assumption | Late orders avoided | Late % | Avg review |
+|---|---|---|---|---|
+| Peak months perform like other months | peak late % 15.1% → 4.5% | **2,223** (34% of late) | 6.8% → 4.5% | +0.05 |
+| Every seller meets the hand-over deadline | late % of missed-deadline orders 21.1% → 5.4% | **1,349** (21%) | 6.8% → 5.4% | +0.03 |
+| The 98 Pareto sellers perform like the rest | their late % 8.2% → 5.9% | **1,009** (16%) | 6.8% → 5.8% | +0.02 |
+
+The 98 sellers are mostly **high-volume** sellers with a modest late rate (8.2%), so fixing them alone avoids less than fixing peak capacity. The average review moves little because only 6.8% of orders are late; for the customers involved the gain is 1–2.5 points.
+
 
 ---
 
@@ -78,12 +129,14 @@ A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Br
 | 2b | `sql/03_delivery_view.sql` | View `vw_delivered_orders`: one clean row per order with handling/transit days, days vs promise, late flag, latest review |
 | 3 | `sql/04_analysis.sql` | 8 business questions (CTEs, window functions: `ROW_NUMBER`, `RANK`, running `SUM() OVER`, `PERCENTILE_CONT`) |
 | 4 | `powerbi/` | Power BI report on the view (Import mode), Power Query columns, DAX measures |
+| 5 | `src/step5_stats_impact.py` | Wilson 95% CIs, Welch t / Mann-Whitney / chi-square tests, OLS regression with controls, what-if scenarios → `outputs/stats_*.csv`, `whatif_scenarios.csv`, `04_state_ci.png` |
 
 ---
 
 ## Limitations
 
-- **One marketplace, 2017–2018, Brazil.** Patterns (peaks, regions) are specific to Olist's network then.
+- **One marketplace, 2017–2018, Brazil.** Results are historical patterns of Olist's network then, not evidence about current logistics performance.
+- **Observational data.** The regression controls for state, month, value, freight and items, but cannot prove that lateness alone causes the lower rating. What-if scenarios assume the improved group would behave like the comparison group.
 - **"Late" uses the date only**, not the time of day, and the promised date is the one shown at purchase.
 - **The data does not say why** Feb–Mar 2018 spiked; the dashboard shows when, not the cause.
 - **Seller vs courier split** is by timestamp: a late hand-over by the seller can also push the courier into a slower period.
@@ -101,8 +154,9 @@ A SQL Server + Power BI analysis of **96,018 delivered orders** from Olist, a Br
    python src/step1_load_sqlserver.py
    ```
 4. In SSMS, run `sql/02_data_checks.sql`, `sql/03_delivery_view.sql`, `sql/04_analysis.sql`.
-5. Open `powerbi/DeliveryLens.pbix` → **Transform data → Data source settings** → change the server to yours → **Refresh**.
+5. `python src/step5_stats_impact.py` (same `SERVER` setting); compare with the tables above.
+6. Open `powerbi/DeliveryLens.pbix` → **Transform data → Data source settings** → change the server to yours → **Refresh**.
 
-**Tech:** SQL Server 2022 · SSMS · T-SQL · Power BI (Power Query, DAX) · Python (pandas, pyodbc)
+**Tech:** SQL Server 2022 · SSMS · T-SQL · Power BI (Power Query, DAX) · Python (pandas, pyodbc, SciPy, statsmodels, matplotlib)
 
 **Author:** Nalluri Sanjay, B.Tech (Hons.) Industrial & Systems Engineering, IIT Kharagpur · [LinkedIn](https://www.linkedin.com/in/sanjaynalluri2405/) · [GitHub](https://github.com/SanjayNalluri)

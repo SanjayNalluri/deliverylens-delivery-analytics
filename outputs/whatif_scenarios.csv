@@ -1,0 +1,4 @@
+scenario,assumption,late_orders_avoided,pct_of_late_orders,late_pct_now,late_pct_after,avg_review_change
+Worst 98 sellers reach other sellers' late rate,their late % falls from 8.2% to 5.9%,1009,15.5,6.8,5.75,0.021
+Peak months reach other months' late rate,peak late % falls from 15.1% to 4.5%,2223,34.1,6.8,4.48,0.047
+Every seller meets the hand-over deadline,late % of missed-deadline orders falls from 21.1% to 5.4%,1349,20.7,6.8,5.39,0.027

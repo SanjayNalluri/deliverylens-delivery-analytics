@@ -1,2 +1,5 @@
 pandas
 pyodbc
+scipy
+statsmodels
+matplotlib

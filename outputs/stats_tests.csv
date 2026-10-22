@@ -1,0 +1,4 @@
+test,groups,difference [95% CI],method,p_value,notes
+Avg review: late vs on-time,2.27 vs 4.29,"-2.02 [-2.06, -1.98]",Welch t-test,<0.001,Mann-Whitney p <0.001; Cohen's d -1.47
+Late %: different vs same state,different 8.2% vs same 4.6%,"3.6 pts [3.3, 3.9]",Chi-square,<0.001,"n = 60,665 vs 34,104"
+Late %: peak vs other months,peak 15.1% vs other 4.5%,"10.7 pts [10.2, 11.2]",Chi-square,<0.001,"n = 20,846 vs 75,172"

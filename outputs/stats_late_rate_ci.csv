@@ -1,0 +1,39 @@
+group_type,group,orders,late_orders,late_pct,ci_low_pct,ci_high_pct
+Overall,All orders,96018,6528,6.8,6.64,6.96
+Customer state (500+ orders),BA,3249,395,12.16,11.08,13.33
+Customer state (500+ orders),CE,1272,176,13.84,12.05,15.84
+Customer state (500+ orders),DF,2071,118,5.7,4.78,6.78
+Customer state (500+ orders),ES,1986,214,10.78,9.49,12.22
+Customer state (500+ orders),GO,1944,128,6.58,5.57,7.77
+Customer state (500+ orders),MA,710,125,17.61,14.98,20.58
+Customer state (500+ orders),MG,11293,519,4.6,4.22,5.0
+Customer state (500+ orders),MS,699,68,9.73,7.75,12.15
+Customer state (500+ orders),MT,882,53,6.01,4.62,7.78
+Customer state (500+ orders),PA,941,106,11.26,9.4,13.44
+Customer state (500+ orders),PB,516,54,10.47,8.11,13.4
+Customer state (500+ orders),PE,1586,153,9.65,8.29,11.2
+Customer state (500+ orders),PR,4892,199,4.07,3.55,4.66
+Customer state (500+ orders),RJ,12291,1495,12.16,11.6,12.75
+Customer state (500+ orders),RS,5310,325,6.12,5.51,6.8
+Customer state (500+ orders),SC,3525,291,8.26,7.39,9.21
+Customer state (500+ orders),SP,40334,1815,4.5,4.3,4.71
+Purchase month,2017-01,749,22,2.94,1.95,4.41
+Purchase month,2017-02,1651,49,2.97,2.25,3.9
+Purchase month,2017-03,2545,116,4.56,3.81,5.44
+Purchase month,2017-04,2303,151,6.56,5.62,7.64
+Purchase month,2017-05,3544,106,2.99,2.48,3.6
+Purchase month,2017-06,3134,95,3.03,2.49,3.69
+Purchase month,2017-07,3861,108,2.8,2.32,3.37
+Purchase month,2017-08,4191,122,2.91,2.44,3.46
+Purchase month,2017-09,4149,181,4.36,3.78,5.03
+Purchase month,2017-10,4478,187,4.18,3.63,4.8
+Purchase month,2017-11,7288,904,12.4,11.67,13.18
+Purchase month,2017-12,5513,411,7.46,6.79,8.18
+Purchase month,2018-01,7069,403,5.7,5.18,6.27
+Purchase month,2018-02,6555,926,14.13,13.3,14.99
+Purchase month,2018-03,7003,1328,18.96,18.06,19.9
+Purchase month,2018-04,6791,306,4.51,4.04,5.03
+Purchase month,2018-05,6719,443,6.59,6.02,7.21
+Purchase month,2018-06,6050,70,1.16,0.92,1.46
+Purchase month,2018-07,6119,207,3.38,2.96,3.87
+Purchase month,2018-08,6306,393,6.23,5.66,6.86
